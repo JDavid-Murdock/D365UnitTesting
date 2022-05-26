@@ -3,6 +3,7 @@ using System.Activities;
 using System.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Query;
 using Moq;
 
 namespace D365.Samples.Plugin.Tests
@@ -39,12 +40,24 @@ namespace D365.Samples.Plugin.Tests
             //next - create an entity object that will allow us to capture the entity record that is passed to the Create method
             Entity actualEntity = new Entity();
 
+            QueryExpression actualQuery = new QueryExpression();
+
             //setup the CRM service mock
             serviceMock.Setup(t => t.Create(It.IsAny<Entity>()))
 
             //when Create is called with any entity as an invocation parameter
             .Returns(idToReturn) //return the idToReturn guid
             .Callback<Entity>(s => actualEntity = s); //store the Create method invocation parameter for inspection later
+
+            Entity anyReturnedEntity = new Entity();
+            anyReturnedEntity.Id = Guid.NewGuid();
+
+            EntityCollection returnCollection = new EntityCollection();
+            returnCollection.Entities.Add(anyReturnedEntity);
+            serviceMock.Setup(t => t.RetrieveMultiple(It.IsAny<QueryBase>()))
+                .Returns(returnCollection)
+                .Callback<QueryExpression>(s => actualQuery = s);
+
             IOrganizationService service = serviceMock.Object;
 
             //set up a mock servicefactory using the CRM service mock
