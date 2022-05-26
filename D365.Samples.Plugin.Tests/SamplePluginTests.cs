@@ -55,8 +55,8 @@ namespace D365.Samples.Plugin.Tests
             EntityCollection returnCollection = new EntityCollection();
             returnCollection.Entities.Add(anyReturnedEntity);
             serviceMock.Setup(t => t.RetrieveMultiple(It.IsAny<QueryBase>()))
-                .Returns(returnCollection)
-                .Callback<QueryExpression>(s => actualQuery = s);
+                .Returns(returnCollection);
+                //.Callback<QueryExpression>(s => actualQuery = s);
 
             IOrganizationService service = serviceMock.Object;
 
